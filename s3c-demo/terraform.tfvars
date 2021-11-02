@@ -1,0 +1,8 @@
+POLICY_PROJECT_ID  = "sw-supply-chain-demo"
+POLICY_REGION      = "us-central1"
+CLOUD_BUILD_SA="551307460056@cloudbuild.gserviceaccount.com"
+BA_KEYRING   = "ba-vulnerability-kr2"
+BA_KEY       = "ba-vulnerability-signer2"
+BA_NOTE_ID   = "ba-vulnerability-note2"
+BA_NOTE_NAME = "ba-vulnerability-note2"
+BA_VULNERABILITY_ATTESTOR = "ba-vulnerability-attestor2"

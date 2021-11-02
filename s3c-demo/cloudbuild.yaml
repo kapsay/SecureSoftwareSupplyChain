@@ -1,0 +1,58 @@
+steps:
+# Run a shell script; and
+# set env variables for its execution
+- name: 'ubuntu'
+  args: ['bash', './myscript.sh']
+  env:
+  - 'PROJECT_ID=$PROJECT_ID'
+  - 'PROJECT_NUMBER=$PROJECT_NUMBER'
+
+- id: 'tf init'
+  name: 'hashicorp/terraform:1.0.0'
+  entrypoint: 'sh'
+  args: 
+  - '-c'
+  - | 
+      echo "*************** TERRAFOM INIT START ******************"
+      terraform init
+      echo "*************** TERRAFOM INIT ENDS ******************"
+
+- id: 'tf plan'
+  name: 'hashicorp/terraform:1.0.0'
+  entrypoint: 'sh'
+  args: 
+  - '-c'
+  - | 
+      echo "*************** TERRAFOM PLAN START ******************"
+      terraform plan
+      echo "*************** TERRAFOM PLAN ENDS ******************"
+
+- id: 'tf show'
+  name: 'hashicorp/terraform:1.0.0'
+  entrypoint: 'sh'
+  args: 
+  - '-c'
+  - | 
+      echo "*************** TERRAFOM SHOW START ******************"
+      terraform show
+      echo "*************** TERRAFOM SHOW ENDS ******************"
+
+- id: 'tf apply'
+  name: 'hashicorp/terraform:1.0.0'
+  entrypoint: 'sh'
+  args: 
+  - '-c'
+  - | 
+      echo "*************** TERRAFOM APPLY START ******************"
+      terraform apply -auto-approve
+      echo "*************** TERRAFOM APPLY ENDS ******************"
+
+#- id: 'tf destroy'
+#  name: 'hashicorp/terraform:1.0.0'
+#  entrypoint: 'sh'
+#  args: 
+#  - '-c'
+#  - | 
+#      echo "*************** TERRAFOM DESTROY START ******************"
+#      terraform destroy -auto-approve
+#      echo "*************** TERRAFOM DESTROY ENDS ******************"
