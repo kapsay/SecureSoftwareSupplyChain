@@ -6,6 +6,8 @@ Building a secure software supply chain is a relatively new topic. [New complian
 
 This blog tries to define what Secure Software Supply Chain is, why it is important, what are the key challenges in building it and also, demonstrates a no-ops method to build a S3C using Cloud Run, Cloud Build and Binary Authorization in Google Cloud. 
 
+[Source Code Repository](https://github.com/kapsay/SecureSoftwareSupplyChain)
+
 ## Problem Statement
 Security is a major pillar of a Cloud Adoption Framework and Operating Model you pick from any Cloud Provider. It is definitely an Important pillar at Google Cloud. Adopting cloud at scale with all security measures and compliance controls in place can be a daunting task for an organization. One of the primary reasons for this is modern threats hits at many layers of the "stack". When I say stack it comprises of all the components involved in serving your users and/or applications.
 
@@ -83,6 +85,7 @@ All the code is available in the repository.
 
 ### Phase I - The Setup 
 **Personas** - Security and Foundation/Infrastructure Team
+[Repository](https://github.com/kapsay/SecureSoftwareSupplyChain)
 
 **Prerequisites**
 
@@ -113,15 +116,12 @@ BA_VULNERABILITY_ATTESTOR = "Attestor Name"
 **Step 1.** Create a keyring and a Key using Cloud KMS 
 
 ```javascript
-// Create Cloud KMS key ring
 resource "google_kms_key_ring" "kms_ring" {
     project  = var.POLICY_PROJECT_ID
     name     = var.BA_KEYRING
     location = var.POLICY_REGION
 }
 
-// Create an asymmetric Cloud KMS key that will be used to sign and 
-// verify vulnerability scan attestations
 resource "google_kms_crypto_key" "kms_key" {
     depends_on = [
       google_kms_key_ring.kms_ring
@@ -138,7 +138,6 @@ resource "google_kms_crypto_key" "kms_key" {
 **Step 2.** Create a Container Analysis Note, which is the metadata that describes a piece of software. Container Analysis API (An implementation of the Grafeas API) stores, enables querying and retrieval of  notes. Assign Cloud Build service account role to retrieve/view the note. 
 
 ```javascript
-// Create a Container Analysis Note
 resource "google_container_analysis_note" "note" {
     name    = var.BA_NOTE_NAME
     project = var.POLICY_PROJECT_ID  
@@ -162,7 +161,6 @@ resource "google_project_iam_member" "permission_iam" {
 **Step 3.** Create an attestor that uses the note created in step 2 to attest to container image artifact. We are naming it as "No Vulnerability Attestor" and using the KMS Public keys (created in Step 1) to verify attestations signed by this attestor.
 
 ```javascript
-// Add the public key for the attestor's signing key
 resource "google_binary_authorization_attestor" "attestor" {
     depends_on = [
       google_container_analysis_note.note
@@ -291,7 +289,56 @@ curl "https://containeranalysis.googleapis.com/v1/projects/${POLICY_PROJECT_ID}/
 EOF
 ```
 
-From the setup point of view, this is it. You can init, plan, show and apply this terraform using a Cloud Build trigger. I have the Cloud Build config file (cloudbuild.yaml) at ***** for reference
+This is all the code you'd need to setup all componenets in the project to use Binary Authorization. You can now init, plan, show and apply this terraform using a Cloud Build trigger. Here is a sample cloudbuild.yaml to perform these steps
+
+```yaml
+steps:
+- name: 'ubuntu'
+  args: ['bash', './myscript.sh']
+  env:
+  - 'PROJECT_ID=$PROJECT_ID'
+  - 'PROJECT_NUMBER=$PROJECT_NUMBER'
+
+- id: 'tf init'
+  name: 'hashicorp/terraform:1.0.0'
+  entrypoint: 'sh'
+  args: 
+  - '-c'
+  - | 
+      echo "*************** TERRAFOM INIT START ******************"
+      terraform init
+      echo "*************** TERRAFOM INIT ENDS ******************"
+
+- id: 'tf plan'
+  name: 'hashicorp/terraform:1.0.0'
+  entrypoint: 'sh'
+  args: 
+  - '-c'
+  - | 
+      echo "*************** TERRAFOM PLAN START ******************"
+      terraform plan
+      echo "*************** TERRAFOM PLAN ENDS ******************"
+
+- id: 'tf show'
+  name: 'hashicorp/terraform:1.0.0'
+  entrypoint: 'sh'
+  args: 
+  - '-c'
+  - | 
+      echo "*************** TERRAFOM SHOW START ******************"
+      terraform show
+      echo "*************** TERRAFOM SHOW ENDS ******************"
+
+- id: 'tf apply'
+  name: 'hashicorp/terraform:1.0.0'
+  entrypoint: 'sh'
+  args: 
+  - '-c'
+  - | 
+      echo "*************** TERRAFOM APPLY START ******************"
+      terraform apply -auto-approve
+      echo "*************** TERRAFOM APPLY ENDS ******************"
+```
 
 One Terraform Apply is done successfully, you can see all the components using the cloud console. 
 
