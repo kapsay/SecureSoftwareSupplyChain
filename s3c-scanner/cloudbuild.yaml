@@ -9,6 +9,6 @@ steps:
   env:
   - 'PROJECT_ID=$PROJECT_ID'
   - 'CLOUD_RUN_APP_NAME=hello'
-  - 'BA_VULNERABILITY_ATTESTOR=ba-vulnerability-attestor2'
-  - 'BA_KEY=ba-vulnerability-signer2'
-  - 'BA_KEYRING=ba-vulnerability-kr2'
+  - 'BA_VULNERABILITY_ATTESTOR="Attestor Name"'
+  - 'BA_KEY=Key Name'
+  - 'BA_KEYRING=Key Ring Name'
