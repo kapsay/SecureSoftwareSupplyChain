@@ -9,33 +9,33 @@ This blog tries to define what Secure Software Supply Chain is, why it is import
 [Source Code Repository](https://github.com/kapsay/SecureSoftwareSupplyChain)
 
 ## Problem Statement
-Security is a major pillar of a Cloud Adoption Framework and Operating Model you pick from any Cloud Provider. It is definitely an Important pillar at Google Cloud. Adopting cloud at scale with all security measures and compliance controls in place can be a daunting task for an organization. One of the primary reasons for this is modern threats hits at many layers of the "stack". When I say stack it comprises of all the components involved in serving your users and/or applications.
+Security is a major pillar of a Cloud Adoption Framework and Operating Model you pick from any Cloud Provider. It is definitely an Important pillar at Google Cloud. Adopting cloud at scale with all security measures and compliance controls in place can be a daunting task for an organization. One of the primary reasons for this is that modern threats hit at many layers of the "stack". When I say stack it comprises all the components involved in serving your users and/or applications.
 
 Modern software architecture and the software delivery is also getting very complex with several tools added in the develop, build and release chain. Many times security tools and policies are introduced as external entities in this chain. 
 
 As we all know that Security is a very deep and wide topic, and we can not possibly address every security aspect in a single article (or even a book), so let's focus on this Secure Software Supply Chain aka S3C here and explore it in detail.
 
 ## What is Secure Software Supply Chain aka S3C
-So first let's try to define Software Supply Chain and some of the vulnerabilities that can be introduced through it. 
+So first let's try to define the Software Supply Chain and some of the vulnerabilities that can be introduced through it. 
 
-At a high level, probably we all know how a food supply chain look like. Take one example; eggs. Eggs are produced in large poultry farms and before coming to your breakfast plate, they go through a journey. Picture below tries to shows that journey. 
+At a high level, probably we all know how a food supply chain looks like. Take one example; eggs. Eggs are produced in large poultry farms and before coming to your breakfast plate, they go through a journey. Picture below tries to show that journey. 
 
 ![S3C Eggs Example](pics/sssc-eggs.png)
 
-Code has a similar journey. It has to go thru several steps before it starts serving traffic in production. While everyone's build-release pipelines are different, this picture shows some of the common steps used in software release pipelines. 
+Code has a similar journey. It has to go through several steps before it starts serving traffic in production. While everyone's build-release pipelines are different, this picture shows some of the common steps used in software release pipelines. 
 
 ![S3C Example](pics/sssc-sw.png)
 
-Now, there is a fundamental security gap here. **What is making sure that only an "Approved" and "Intended" software can be deployed in the targeted environment?** In egg supply chain example; how will you make sure that some malicious actor is not putting "Bad Eggs" in the grocery store shelf and you end up buys those bad eggs? As you can guess, one bad egg on the shelf can have a severe health impact on this grocery chain's customers. 
+Now, there is a fundamental security gap here. **What is making sure that only an "Approved" and "Intended" software can be deployed in the targeted environment?** In the egg supply chain example; how will you make sure that some malicious actor is not putting "Bad Eggs" on the grocery store shelf and you end up buying those bad eggs? As you can guess, one bad egg on the shelf can have a severe health impact on this grocery chain's customers. 
 Same way what is preventing a malicious actor (internal or external) to inject a bad dependency in the software supply chain that can cause major security issues for an organization?
 
-Many such security gaps pop-up very frequently these days in some major software platforms and impacts organizations of any size. The impacts of broken software supply chains are such that in **recent ["Executive Order on Improving the Nation’s Cybersecurity"](https://www.whitehouse.gov/briefing-room/presidential-actions/2021/05/12/executive-order-on-improving-the-nations-cybersecurity/) federal government put a specific section (Section 4) about "Enhancing Software Supply Chain Security"**
+Many such security gaps pop-up very frequently these days in some major software platforms and impact organizations of any size. The impacts of broken software supply chains are such that in **recent ["Executive Order on Improving the Nation’s Cybersecurity"](https://www.whitehouse.gov/briefing-room/presidential-actions/2021/05/12/executive-order-on-improving-the-nations-cybersecurity/) federal government put a specific section (Section 4) about "Enhancing Software Supply Chain Security"**
 
 Section 4.e.3 specifically calls out to employ automated tools, or comparable processes, to maintain trusted source code supply chains, thereby ensuring the integrity of the code.
 
 This is a fundamental change in how we traditionally thought about software security, mostly as an afterthought in software delivery.
 
-Another major challenge that is introduced by this is the introduction of many tools in the software supply chain + operations of those tools + effort to integrate those tools. For a software developer and to a business; it is an added overhead, since software developers want to just develop the code and business wants to use it as quickly as possible. So it's challenging to keep the right balance. 
+Another major challenge that is introduced by this is the introduction of many tools in the software supply chain + operations of those tools + effort to integrate those tools. For a software developer and for a business; it is an added overhead, since software developers want to just develop the code and business wants to use it as quickly as possible. So it's challenging to keep the right balance. 
 
 So the fundamental questions for an organization here are:
 1. How to build a S3C, with a policy (as a Code) driving the decision to deploy or not deploy a code in runtime? 
@@ -44,13 +44,13 @@ So the fundamental questions for an organization here are:
 
 ## Few solutions to build a S3C
 
-- One answer may be is to put some manual checks and validations before deployment. Well, agree, but we all know with rapid development and frequent deployments it is nearly impossible to do such validations manually without impacting the velocity. This is not a good answer to question#2.
+- One answer may be to put some manual checks and validations before deployment. Well, agree, but we all know with rapid development and frequent deployments it is nearly impossible to do such validations manually without impacting the velocity. This is not a good answer to question#2.
 - Another option may be to introduce 3rd party tools that validate and attest your software before going to runtime. Generally these tools will bring in a lot of operational overhead. For example, you need to install these tools somewhere, upgrade them with new versions, monitor them to make sure they are up and running, and many more.. This is not a good answer to question#3 above.
 
 Is there a better solution? Here comes **Binary Authorization** for rescue. 
 
 ## What is Binary Authorization and Architecture
-So, now let's explore what Binary Authorization is in detail. Binary Authorization is a managed service in Google Cloud that helps build deploy-time security controls to ensure only trusted/approved container image can be deployed in the runtimes environments like Google Kubernetes Engine (GKE) or Cloud Run. 
+So, now let's explore what Binary Authorization is in detail. Binary Authorization is a managed service in Google Cloud that helps build deploy-time security controls to ensure only trusted/approved container images can be deployed in the runtimes environments like Google Kubernetes Engine (GKE) or Cloud Run. 
 
 Being a fully managed service, to adopt Binary Authorization you do not have to stand up any infrastructure or build an operations team. Just enable the BInary Authorization API in your project and you are ready to go.
 This solves for question#3. 
@@ -67,25 +67,23 @@ Here is an architecture that shows the working of Binary Authorization.
 
 ![S3C Architecture](pics/SSSC-arch.png)
 
-This Architecture shows how Binary Authorization enforces a policy to makes sure that if there is any critical vulnerability exists in the image/code then the image will not get deployed in Cloud Run. In order to accomplish this the image is signed after vulnerability scanning (a built-in feature in Google Container Registry) when no critical vulnerability is found. 
+This Architecture shows how Binary Authorization enforces a policy to make sure that if there is any critical vulnerability exists in the image/code then the image will not get deployed in Cloud Run. In order to accomplish this the image is signed after vulnerability scanning (a built-in feature in Google Container Registry) when no critical vulnerability is found. 
 
-There might be other scenarios (mentioned above) where you want to make sure that the image is deployed whe it passes QA checks (it is up to you to define what that QA check really mean). 
+There might be other scenarios (mentioned above) where you want to make sure that the image is deployed when it passes QA checks (it is up to you to define what that QA check really means). FYI; in our demo below, QA means no critical vulnerabilities in the image.
 
 In any case, if a malicious actor tries to deploy an image in Cloud Run that is not signed by the defined supply chain then Binary Authorization won't let it go to. 
 
 One of the biggest benefits of this architecture is the clear separation of duties, for example:
-1. Security Team - write Binary Authorization Policy in YAML. Grant exception if at all needed, again thru a change in Policy YAML.
+1. Security Team - write Binary Authorization Policy in YAML. Grant exception if at all needed, again with a change in Policy YAML.
 2. Foundation/Infrastructure Team - use GCP Project creation process to enforce Binary Authorization Policy. This is done mostly in Terraform and is explained in detail below.
 3. Build & Release Team - creates build and release scripts, may be in Cloud Build using cloudbuild.yaml, to enforce the standards like, image vulnerability scanning, other QA checks, etc. 
 4. Developers - can't change #1, #2 or #3 that will allow a complete focus on shipping code. 
 
-## The Code - Terraform
-
-All the code is available in the repository. 
+## Demonstration
 
 ### Phase I - The Setup 
 **Personas** - Security and Foundation/Infrastructure Team
-[Repository](https://github.com/kapsay/SecureSoftwareSupplyChain)
+[Repository](https://github.com/kapsay/SecureSoftwareSupplyChain/s3c-demo)
 
 **Prerequisites**
 
@@ -289,7 +287,7 @@ curl "https://containeranalysis.googleapis.com/v1/projects/${POLICY_PROJECT_ID}/
 EOF
 ```
 
-This is all the code you'd need to setup all componenets in the project to use Binary Authorization. You can now init, plan, show and apply this terraform using a Cloud Build trigger. Here is a sample cloudbuild.yaml to perform these steps
+This is all the code you'd need to setup all components in the project to use Binary Authorization. You can now init, plan, show and apply this terraform using a Cloud Build trigger. Here is a sample cloudbuild.yaml to perform these steps
 
 ```yaml
 steps:
@@ -342,8 +340,9 @@ steps:
 
 One Terraform Apply is done successfully, you can see all the components using the cloud console. 
 
-### Phase I - The setup 
+### Phase II - The Validation 
 **Persona** - Build & Release Team
+[Repository](https://github.com/kapsay/SecureSoftwareSupplyChain/s3c-scanner)
 
 Once the setup is done, let's go to the image verification, attestation and deployment phase. 
 
@@ -378,7 +377,7 @@ fi
 
 ```
 
-### Phase III - Cloud Run Deployment
+### Phase III - The Deployment
 
 **Persona** - Developers
 
